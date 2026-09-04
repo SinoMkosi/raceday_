@@ -45,7 +45,7 @@ jobs:
           fi
           echo "SQL script found."
 
-      - name: Check README exists
+      -name: Check README exists
         run: |
           if [ ! -f "README.md" ]; then
             echo "ERROR: README.md is missing from the repository root."
