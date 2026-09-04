@@ -42,6 +42,8 @@ that a root README.md is present.
 
 *Latest successful build:*
 <img width="1356" height="654" alt="Screenshot 2026-09-04 231155" src="https://github.com/user-attachments/assets/4989372c-31d3-4542-a152-ae3d1c4947e3" />
+<img width="1359" height="717" alt="Screenshot 2026-09-04 212027" src="https://github.com/user-attachments/assets/13d6edd2-3f1e-411a-a0c8-c515e24cd10c" />
+
 
 ## Notes / Deviations
 
