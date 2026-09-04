@@ -31,7 +31,7 @@ jobs:
 
       - name: Check API endpoint plan exists (PDF or Markdown)
         run: |
-          if ! find docs -maxdepth 1 -iname "api.md" -o -iname "endpoint.md" -o -iname "api.pdf" -o -iname "endpoint.pdf" | grep -q .; then
+          if ! find docs -maxdepth 1 \( -iname "*api*.md" -o -iname "*endpoint*.md" -o -iname "*api*.pdf" -o -iname "*endpoint*.pdf" \) | grep -q .; then
             echo "ERROR: No API endpoint plan (*.md or *.pdf) found in /docs."
             exit 1
           fi
