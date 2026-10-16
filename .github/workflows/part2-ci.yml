@@ -1,0 +1,22 @@
+name: Part 2 - Build and Test
+
+on:
+  push:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        run: dotnet build Part2/RaceDay.Api/RaceDay.Api.slnx
+
+      - name: Run tests
+        run: dotnet test Part2/RaceDay.Api/RaceDay.Api.slnx --no-build
