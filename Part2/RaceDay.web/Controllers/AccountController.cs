@@ -102,6 +102,11 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction("Login");
         }
 
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
         private static string FriendlyError(ApiResult result)
         {
             if (result.StatusCode == 0)

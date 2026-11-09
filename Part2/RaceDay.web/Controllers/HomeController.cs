@@ -1,18 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using RaceDay.web.Models;
+using RaceDay.Web.Filters;
+using RaceDay.Web.Models;
 using System.Diagnostics;
 
-namespace RaceDay.web.Controllers
+namespace RaceDay.Web.Controllers
 {
     public class HomeController : Controller
     {
+        [SessionAuthorize]
         public IActionResult Index()
         {
-            return View();
-        }
+            if (HttpContext.Session.GetString("Role") == "Organiser")
+            {
+                return RedirectToAction("Dashboard", "Organiser");
+            }
 
-        public IActionResult Privacy()
-        {
             return View();
         }
 
