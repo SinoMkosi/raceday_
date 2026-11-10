@@ -49,6 +49,8 @@ else
                         <td>@item.DistanceKm km</td>
                         <td>@item.EventType</td>
                         <td class="text-end">
+                            <a asp-controller="OrganiserCategories" asp-action="Index" asp-route-eventId="@item.EventId" class="btn btn-sm btn-outline-secondary">Categories</a>
+                            <a asp-controller="OrganiserEnrolments" asp-action="Index" asp-route-eventId="@item.EventId" class="btn btn-sm btn-outline-secondary">Enrolments</a>
                             <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-outline-primary">Edit</a>
                             <form asp-action="Delete" asp-route-id="@item.EventId" method="post" class="d-inline"
                                   onsubmit="return confirm('Delete this event?');">
