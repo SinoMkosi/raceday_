@@ -118,13 +118,22 @@ namespace RaceDay.Api.Controllers
                 from r in _db.Results
                 join en in _db.Enrolments on r.EnrolmentId equals en.EnrolmentId
                 join ev in _db.Events on en.EventId equals ev.EventId
+                join c in _db.Categories on en.CategoryId equals c.CategoryId
                 where en.UserId == userId
+                orderby ev.Date descending
                 select new
                 {
                     r.ResultId,
                     EventName = ev.Name,
+                    EventDate = ev.Date,
+                    CategoryName = c.Name,
                     r.FinishTime,
-                    r.Position
+                    r.Position,
+                    TotalFinishers = (
+                        from r2 in _db.Results
+                        join e2 in _db.Enrolments on r2.EnrolmentId equals e2.EnrolmentId
+                        where e2.EventId == en.EventId
+                        select r2).Count()
                 }).ToListAsync();
 
             return Ok(list);

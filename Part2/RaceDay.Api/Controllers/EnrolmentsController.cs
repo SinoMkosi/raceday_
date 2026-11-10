@@ -42,7 +42,8 @@ namespace RaceDay.Api.Controllers
             {
                 UserId = userId,
                 EventId = eventId,
-                CategoryId = dto.CategoryId
+                CategoryId = dto.CategoryId,
+                Status = "Pending"
             };
 
             _db.Enrolments.Add(enrolment);
@@ -77,10 +78,32 @@ namespace RaceDay.Api.Controllers
                     ParticipantName = u.FirstName + " " + u.LastName,
                     en.CategoryId,
                     CategoryName = c.Name,
-                    en.EnrolledOn
+                    en.EnrolledOn,
+                    en.Status
                 }).ToListAsync();
 
             return Ok(list);
+        }
+
+        /// <summary>Confirms an enrolment for your own event. Organisers only.</summary>
+        /// <response code="200">Enrolment confirmed.</response>
+        /// <response code="403">Not an Organiser, or not your event.</response>
+        /// <response code="404">Enrolment not found.</response>
+        [HttpPut("enrolments/{id}/confirm")]
+        [SessionAuthorize("Organiser")]
+        public async Task<IActionResult> Confirm(int id)
+        {
+            var enrolment = await _db.Enrolments.FindAsync(id);
+            if (enrolment == null) return NotFound("Enrolment not found.");
+
+            var ev = await _db.Events.FindAsync(enrolment.EventId);
+            if (ev == null || ev.OrganiserId != HttpContext.Session.GetInt32("UserId"))
+                return StatusCode(403, "You can only confirm enrolments for your own events.");
+
+            enrolment.Status = "Confirmed";
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Enrolment confirmed.", enrolment.EnrolmentId, enrolment.Status });
         }
 
         /// <summary>Gets the logged-in Participant's own enrolments.</summary>
@@ -91,7 +114,27 @@ namespace RaceDay.Api.Controllers
         public async Task<IActionResult> GetMine()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
-            return Ok(await _db.Enrolments.Where(e => e.UserId == userId).ToListAsync());
+
+            var list = await (
+                from en in _db.Enrolments
+                join ev in _db.Events on en.EventId equals ev.EventId
+                join c in _db.Categories on en.CategoryId equals c.CategoryId
+                where en.UserId == userId
+                orderby ev.Date
+                select new
+                {
+                    en.EnrolmentId,
+                    en.UserId,
+                    en.EventId,
+                    en.CategoryId,
+                    en.EnrolledOn,
+                    en.Status,
+                    EventName = ev.Name,
+                    EventDate = ev.Date,
+                    CategoryName = c.Name
+                }).ToListAsync();
+
+            return Ok(list);
         }
     }
 }
