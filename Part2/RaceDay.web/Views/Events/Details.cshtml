@@ -1,0 +1,96 @@
+﻿@model RaceDay.Web.Models.EventDetailsViewModel
+@{
+    ViewData["Title"] = Model.Event.Name;
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mb-3">Back to events</a>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<div class="card mb-4">
+    @if (!string.IsNullOrWhiteSpace(Model.Event.BannerUrl))
+    {
+        <img src="@Model.Event.BannerUrl" class="card-img-top" style="max-height:280px;object-fit:cover;" alt="@Model.Event.Name banner" />
+    }
+    <div class="card-body">
+        <h2 class="card-title">@Model.Event.Name</h2>
+        <p>
+            <span class="badge bg-primary">@Model.Event.EventType</span>
+            <span class="badge bg-secondary">@Model.Event.DistanceKm km</span>
+            @if (Model.IsPast)
+            {
+                <span class="badge bg-dark">Past event</span>
+            }
+        </p>
+        <p class="mb-1"><strong>Date:</strong> @Model.Event.Date.ToString("dddd, dd MMM yyyy HH:mm")</p>
+        <p class="mb-3"><strong>Location:</strong> @Model.Event.Location</p>
+        <p>@Model.Event.Description</p>
+    </div>
+</div>
+
+<h4>Categories</h4>
+
+@if (Model.Categories.Count == 0)
+{
+    <p>The organiser has not added any categories yet, so you cannot enrol for now.</p>
+}
+else
+{
+    <ul>
+        @foreach (var c in Model.Categories)
+        {
+            <li>@c.Name</li>
+        }
+    </ul>
+}
+
+<h4 class="mt-4">Enrol</h4>
+
+@if (Model.AlreadyEnrolled)
+{
+    <div class="alert alert-info">
+        You are enrolled in the <strong>@Model.EnrolledCategory</strong> category.
+        Status:
+        @if (Model.EnrolmentStatus == "Confirmed")
+        {
+            <span class="badge bg-success">Confirmed</span>
+        }
+        else
+        {
+            <span class="badge bg-warning text-dark">Pending</span>
+        }
+    </div>
+}
+else if (Model.IsPast)
+{
+    <p>This event has already taken place.</p>
+}
+else if (Model.Categories.Count > 0)
+{
+    <form asp-action="Enrol" method="post" class="row g-2">
+        <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+        <div class="col-md-5">
+            <select name="categoryId" class="form-select">
+                <option value="">Choose a category...</option>
+                @foreach (var c in Model.Categories)
+                {
+                    <option value="@c.CategoryId">@c.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Enrol now</button>
+        </div>
+    </form>
+}
