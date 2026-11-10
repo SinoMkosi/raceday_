@@ -7,5 +7,6 @@
         public int EventId { get; set; }
         public int CategoryId { get; set; }
         public DateTime EnrolledOn { get; set; } = DateTime.UtcNow;
+        public string Status { get; set; } = "Pending";
     }
 }

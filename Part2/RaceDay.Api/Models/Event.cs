@@ -10,5 +10,6 @@
         public double DistanceKm { get; set; }
         public string EventType { get; set; } = string.Empty; // "Run", "Walk" or "Cycle"
         public int OrganiserId { get; set; }
+        public string? BannerUrl { get; set; }
     }
 }
