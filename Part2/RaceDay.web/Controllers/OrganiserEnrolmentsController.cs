@@ -55,5 +55,23 @@ namespace RaceDay.Web.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Confirm(int eventId, int id)
+        {
+            var result = await _api.SendAsync(HttpMethod.Put, $"api/enrolments/{id}/confirm");
+
+            if (result.Success)
+            {
+                TempData["Success"] = "Enrolment confirmed.";
+            }
+            else
+            {
+                TempData["Error"] = ApiErrors.Friendly(result);
+            }
+
+            return RedirectToAction("Index", new { eventId });
+        }
     }
 }

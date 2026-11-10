@@ -8,6 +8,7 @@
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public DateTime EnrolledOn { get; set; }
+        public string Status { get; set; } = "Pending";
     }
 
     public class EnrolmentsPageViewModel
