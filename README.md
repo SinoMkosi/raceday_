@@ -12,7 +12,7 @@ RaceDay lets Organisers create running, walking and cycling events, and lets Par
 - Organiser: dashboard, create/edit/delete events, categories, enrolments (confirm), results entry
 - Participant: events list with filters, event details, enrol, my enrolments, my results, profile
 - Enrolment status colours: green = Confirmed, amber = Pending
-- Azure Blob Storage: the API has endpoints to upload and serve event banners and profile pictures. The website upload forms are not connected yet.
+- Azure Blob Storage: Organisers upload event banners and Participants upload profile pictures. The website sends the file to the API, the API stores it in Azure Blob Storage, and the website never talks to Azure directly.
 
 ## MVC structure
 Controllers in RaceDay.Web call the API through one `ApiClient` class, which keeps the API session cookie. Models carry the data and Razor views display it.
@@ -30,7 +30,7 @@ Open http://localhost:8080
 Open `Part2/RaceDay.Api/RaceDay.Api.slnx` in Visual Studio, set **RaceDay.Api** and **RaceDay.Web** as multiple startup projects, and start. Register an Organiser and a Participant account to try it.
 
 ## Demo video
-(YouTube link to follow)
+
 
 
 ---
