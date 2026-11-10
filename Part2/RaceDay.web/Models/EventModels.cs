@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace RaceDay.Web.Models
 {
@@ -12,7 +13,14 @@ namespace RaceDay.Web.Models
         public double DistanceKm { get; set; }
         public string EventType { get; set; } = string.Empty;
         public int OrganiserId { get; set; }
-        public string? BannerUrl { get; set; }
+
+        [JsonPropertyName("bannerUrl")]
+        public string? BannerName { get; set; }
+
+        [JsonIgnore]
+        public string? BannerUrl => string.IsNullOrWhiteSpace(BannerName)
+            ? null
+            : "/Images/Get?name=" + Uri.EscapeDataString(BannerName);
     }
 
     public class EventViewModel
@@ -40,5 +48,10 @@ namespace RaceDay.Web.Models
         [Required(ErrorMessage = "Please choose an event type.")]
         [Display(Name = "Event type")]
         public string EventType { get; set; } = string.Empty;
+
+        [Display(Name = "Banner image (optional)")]
+        public IFormFile? Banner { get; set; }
+
+        public string? CurrentBannerSrc { get; set; }
     }
 }

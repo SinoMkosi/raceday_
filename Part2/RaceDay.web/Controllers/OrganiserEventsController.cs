@@ -29,6 +29,29 @@ namespace RaceDay.Web.Controllers
             };
         }
 
+        private static string UploadMessage(ApiResult r)
+        {
+            if (r.StatusCode == 400 || r.StatusCode == 503)
+            {
+                return r.Body.Trim().Trim('"');
+            }
+
+            return ApiErrors.Friendly(r);
+        }
+
+        private static int? ReadEventId(string body)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(body);
+                return doc.RootElement.GetProperty("eventId").GetInt32();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -72,6 +95,22 @@ namespace RaceDay.Web.Controllers
                 return View(model);
             }
 
+            if (model.Banner != null && model.Banner.Length > 0)
+            {
+                var newId = ReadEventId(result.Body);
+
+                if (newId.HasValue)
+                {
+                    var up = await _api.SendFileAsync($"api/Events/{newId.Value}/banner", model.Banner);
+
+                    if (!up.Success)
+                    {
+                        TempData["Error"] = "Event created, but the banner was not saved: " + UploadMessage(up);
+                        return RedirectToAction("Index");
+                    }
+                }
+            }
+
             TempData["Success"] = "Event created.";
             return RedirectToAction("Index");
         }
@@ -103,7 +142,8 @@ namespace RaceDay.Web.Controllers
                 Date = item.Date,
                 Location = item.Location,
                 DistanceKm = item.DistanceKm,
-                EventType = item.EventType
+                EventType = item.EventType,
+                CurrentBannerSrc = item.BannerUrl
             });
         }
 
@@ -122,6 +162,17 @@ namespace RaceDay.Web.Controllers
             {
                 ModelState.AddModelError(string.Empty, ApiErrors.Friendly(result));
                 return View(model);
+            }
+
+            if (model.Banner != null && model.Banner.Length > 0)
+            {
+                var up = await _api.SendFileAsync($"api/Events/{model.EventId}/banner", model.Banner);
+
+                if (!up.Success)
+                {
+                    TempData["Error"] = "Event updated, but the banner was not saved: " + UploadMessage(up);
+                    return RedirectToAction("Index");
+                }
             }
 
             TempData["Success"] = "Event updated.";

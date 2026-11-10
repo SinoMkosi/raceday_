@@ -58,5 +58,33 @@ namespace RaceDay.Web.Controllers
             TempData["Success"] = "Profile updated.";
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadPicture(IFormFile? picture)
+        {
+            if (picture == null || picture.Length == 0)
+            {
+                TempData["Error"] = "Please choose an image to upload.";
+                return RedirectToAction("Index");
+            }
+
+            var result = await _api.SendFileAsync("api/Profile/picture", picture);
+
+            if (result.Success)
+            {
+                TempData["Success"] = "Profile picture updated.";
+            }
+            else if (result.StatusCode == 400 || result.StatusCode == 503)
+            {
+                TempData["Error"] = result.Body.Trim().Trim('"');
+            }
+            else
+            {
+                TempData["Error"] = ApiErrors.Friendly(result);
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }

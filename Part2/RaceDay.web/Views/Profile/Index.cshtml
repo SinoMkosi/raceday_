@@ -1,6 +1,7 @@
 ﻿@model RaceDay.Web.Models.ProfileViewModel
 @{
     ViewData["Title"] = "My profile";
+    var initial = Model.FirstName.Length > 0 ? Model.FirstName.Substring(0, 1).ToUpper() : "?";
 }
 
 <div class="row justify-content-center">
@@ -11,10 +12,36 @@
         {
             <div class="alert alert-success">@TempData["Success"]</div>
         }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
         @if (ViewBag.Error != null)
         {
             <div class="alert alert-danger">@ViewBag.Error</div>
         }
+
+        <div class="text-center mb-3">
+            @if (!string.IsNullOrWhiteSpace(Model.PictureSrc))
+            {
+                <img src="@Model.PictureSrc" alt="Profile picture" class="rounded-circle" style="width:120px;height:120px;object-fit:cover;" />
+            }
+            else
+            {
+                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center"
+                     style="width:120px;height:120px;font-size:2.5rem;">
+                    @initial
+                </div>
+            }
+        </div>
+
+        <form asp-action="UploadPicture" method="post" enctype="multipart/form-data" class="mb-4">
+            <div class="input-group">
+                <input type="file" name="picture" class="form-control" accept="image/png,image/jpeg,image/webp,image/gif" />
+                <button type="submit" class="btn btn-outline-primary">Upload picture</button>
+            </div>
+            <div class="form-text">JPG, PNG, WEBP or GIF, up to 5 MB.</div>
+        </form>
 
         <form asp-action="Index" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
