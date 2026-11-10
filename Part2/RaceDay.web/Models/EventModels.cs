@@ -12,6 +12,7 @@ namespace RaceDay.Web.Models
         public double DistanceKm { get; set; }
         public string EventType { get; set; } = string.Empty;
         public int OrganiserId { get; set; }
+        public string? BannerUrl { get; set; }
     }
 
     public class EventViewModel

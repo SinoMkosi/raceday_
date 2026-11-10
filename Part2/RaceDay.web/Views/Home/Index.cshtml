@@ -1,6 +1,85 @@
-﻿@{
+﻿@model RaceDay.Web.Models.EventsFilterViewModel
+@{
     ViewData["Title"] = "Upcoming events";
 }
 
-<h2>Upcoming events</h2>
-<p>Events will show here soon.</p>
+<h2 class="mb-3">Upcoming events</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form method="get" asp-action="Index" class="row g-2 mb-4">
+    <div class="col-md-4">
+        <input type="text" name="search" value="@Model.Search" class="form-control" placeholder="Search by name or location" />
+    </div>
+    <div class="col-md-3">
+        <select name="eventType" class="form-select">
+            <option value="">All types</option>
+            <option value="Run" selected="@(Model.EventType == "Run" ? "selected" : null)">Run</option>
+            <option value="Walk" selected="@(Model.EventType == "Walk" ? "selected" : null)">Walk</option>
+            <option value="Cycle" selected="@(Model.EventType == "Cycle" ? "selected" : null)">Cycle</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="maxDistance" class="form-select">
+            <option value="">Any distance</option>
+            <option value="5" selected="@(Model.MaxDistance == 5 ? "selected" : null)">Up to 5 km</option>
+            <option value="10" selected="@(Model.MaxDistance == 10 ? "selected" : null)">Up to 10 km</option>
+            <option value="21.1" selected="@(Model.MaxDistance == 21.1 ? "selected" : null)">Up to 21.1 km</option>
+            <option value="42.2" selected="@(Model.MaxDistance == 42.2 ? "selected" : null)">Up to 42.2 km</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (Model.Events.Count == 0)
+{
+    <p>No upcoming events match your filters.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        @foreach (var ev in Model.Events)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    @if (!string.IsNullOrWhiteSpace(ev.BannerUrl))
+                    {
+                        <img src="@ev.BannerUrl" class="card-img-top" style="height:160px;object-fit:cover;" alt="@ev.Name banner" />
+                    }
+                    else
+                    {
+                        <div class="bg-dark text-white d-flex align-items-center justify-content-center" style="height:160px;">
+                            <span class="fs-4 fw-bold">@ev.EventType</span>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@ev.Name</h5>
+                        <p class="card-text mb-1">@ev.Date.ToString("dd MMM yyyy HH:mm")</p>
+                        <p class="card-text mb-1">@ev.Location</p>
+                        <p class="card-text">
+                            <span class="badge bg-primary">@ev.EventType</span>
+                            <span class="badge bg-secondary">@ev.DistanceKm km</span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.EventId" class="btn btn-outline-primary w-100">View details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
