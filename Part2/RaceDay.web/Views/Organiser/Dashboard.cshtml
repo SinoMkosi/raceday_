@@ -1,7 +1,85 @@
-﻿@{
+﻿@model RaceDay.Web.Models.DashboardViewModel
+@{
     ViewData["Title"] = "Dashboard";
 }
 
-<h2>Organiser dashboard</h2>
-<p>Your summary will show here soon.</p>
-<a asp-controller="OrganiserEvents" asp-action="Index" class="btn btn-primary">Manage my events</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Organiser dashboard</h2>
+    <a asp-controller="OrganiserEvents" asp-action="Index" class="btn btn-primary">Manage my events</a>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6">@Model.TotalEvents</div>
+                <div class="text-muted">Events created</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6">@Model.UpcomingEvents</div>
+                <div class="text-muted">Upcoming events</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6">@Model.TotalEnrolments</div>
+                <div class="text-muted">Total enrolments</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Your events</h4>
+
+@if (Model.Events.Count == 0)
+{
+    <p>You have not created any events yet.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Enrolments</th>
+                    <th>When</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in Model.Events)
+                {
+                    <tr>
+                        <td>@ev.Name</td>
+                        <td>@ev.Date.ToString("dd MMM yyyy HH:mm")</td>
+                        <td>@ev.Location</td>
+                        <td>@ev.EnrolmentCount</td>
+                        <td>
+                            @if (ev.IsUpcoming)
+                            {
+                                <span class="badge bg-primary">Upcoming</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Past</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
