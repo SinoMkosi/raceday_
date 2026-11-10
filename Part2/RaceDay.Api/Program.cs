@@ -1,11 +1,14 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api;
+using RaceDay.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddSingleton<BlobStorageService>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

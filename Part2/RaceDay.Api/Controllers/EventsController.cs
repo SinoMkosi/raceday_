@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Dtos;
 using RaceDay.Api.Models;
 using RaceDay.Api.Security;
+using RaceDay.Api.Services;
 
 namespace RaceDay.Api.Controllers
 {
@@ -12,10 +13,12 @@ namespace RaceDay.Api.Controllers
     public class EventsController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly BlobStorageService _blobs;
 
-        public EventsController(AppDbContext db)
+        public EventsController(AppDbContext db, BlobStorageService blobs)
         {
             _db = db;
+            _blobs = blobs;
         }
 
         private static bool IsValidType(string type) =>
@@ -97,6 +100,43 @@ namespace RaceDay.Api.Controllers
             return Ok(ev);
         }
 
+        /// <summary>Uploads or replaces the banner image of your own event. Organisers only.</summary>
+        /// <response code="200">Banner saved.</response>
+        /// <response code="400">Not a valid image.</response>
+        /// <response code="403">Not an Organiser, or not your event.</response>
+        /// <response code="404">Event not found.</response>
+        /// <response code="503">Image storage is not available.</response>
+        [HttpPost("{id}/banner")]
+        [SessionAuthorize("Organiser")]
+        public async Task<IActionResult> UploadBanner(int id, IFormFile file)
+        {
+            var ev = await _db.Events.FindAsync(id);
+            if (ev == null) return NotFound();
+
+            if (ev.OrganiserId != HttpContext.Session.GetInt32("UserId"))
+                return StatusCode(403, "You can only change images for your own events.");
+
+            var problem = BlobStorageService.Validate(file);
+            if (problem != null) return BadRequest(problem);
+
+            if (!_blobs.IsConfigured)
+                return StatusCode(503, "Image storage is not available right now.");
+
+            try
+            {
+                var oldName = ev.BannerUrl;
+                ev.BannerUrl = await _blobs.UploadAsync(file, "banners");
+                await _db.SaveChangesAsync();
+                await _blobs.DeleteAsync(oldName);
+
+                return Ok(new { ev.EventId, ev.BannerUrl });
+            }
+            catch (Exception)
+            {
+                return StatusCode(503, "Image storage is not available right now.");
+            }
+        }
+
         /// <summary>Deletes your own event. Organisers only.</summary>
         /// <response code="200">Event deleted.</response>
         /// <response code="400">Event already has enrolments.</response>
@@ -115,10 +155,14 @@ namespace RaceDay.Api.Controllers
             if (await _db.Enrolments.AnyAsync(e => e.EventId == id))
                 return BadRequest("This event already has enrolments and cannot be deleted.");
 
+            var bannerName = ev.BannerUrl;
+
             var categories = _db.Categories.Where(c => c.EventId == id);
             _db.Categories.RemoveRange(categories);
             _db.Events.Remove(ev);
             await _db.SaveChangesAsync();
+
+            await _blobs.DeleteAsync(bannerName);
 
             return Ok(new { message = "Event deleted." });
         }
