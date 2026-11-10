@@ -1,3 +1,40 @@
+# RaceDay: Part 3 (MVC Web Application)
+
+RaceDay lets Organisers create running, walking and cycling events, and lets Participants enrol and view their results.
+
+## Projects
+- **RaceDay.Api**: the Part 2 REST API (database, sessions, Azure Blob Storage endpoints)
+- **RaceDay.Web**: the ASP.NET Core MVC front end. It calls the API only and has no database access.
+- **RaceDayTests**: unit tests
+
+## What works
+- Register, log in and log out, with session-based roles (Organiser and Participant)
+- Organiser: dashboard, create/edit/delete events, categories, enrolments (confirm), results entry
+- Participant: events list with filters, event details, enrol, my enrolments, my results, profile
+- Enrolment status colours: green = Confirmed, amber = Pending
+- Azure Blob Storage: the API has endpoints to upload and serve event banners and profile pictures. The website upload forms are not connected yet.
+
+## MVC structure
+Controllers in RaceDay.Web call the API through one `ApiClient` class, which keeps the API session cookie. Models carry the data and Razor views display it.
+
+## Run with Docker
+The API must be running first (start `RaceDay.Api` with its http profile). Then, from the `Part2/RaceDay.Web` folder:
+
+```
+docker build -t raceday-web .
+docker run -p 8080:8080 -e ApiBaseUrl=http://host.docker.internal:5212/ raceday-web
+```
+Open http://localhost:8080
+
+## Run locally
+Open `Part2/RaceDay.Api/RaceDay.Api.slnx` in Visual Studio, set **RaceDay.Api** and **RaceDay.Web** as multiple startup projects, and start. Register an Organiser and a Participant account to try it.
+
+## Demo video
+(YouTube link to follow)
+
+
+---
+# Part 2
 # RaceDay System
 
 A database and API planning project for an event registration and results
