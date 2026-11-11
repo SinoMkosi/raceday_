@@ -30,6 +30,7 @@ Open http://localhost:8080. The API must be running on the host machine. The All
 Open `Part2/RaceDay.Api/RaceDay.Api.slnx` in Visual Studio, set **RaceDay.Api** and **RaceDay.Web** as multiple startup projects, and start. Register an Organiser and a Participant account to try it.
 
 ## Demo video
+https://youtu.be/nJwt5YvRtE4?si=f3D6O35UdlgRTHS5
 
 
 
