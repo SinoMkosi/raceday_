@@ -18,13 +18,13 @@ RaceDay lets Organisers create running, walking and cycling events, and lets Par
 Controllers in RaceDay.Web call the API through one `ApiClient` class, which keeps the API session cookie. Models carry the data and Razor views display it.
 
 ## Run with Docker
-The API must be running first (start `RaceDay.Api` with its http profile). Then, from the `Part2/RaceDay.Web` folder:
+Start RaceDay.Api in Visual Studio first (it listens on https://localhost:7228). Then, from the `Part2/RaceDay.web` folder:
 
 ```
 docker build -t raceday-web .
-docker run -p 8080:8080 -e ApiBaseUrl=http://host.docker.internal:5212/ raceday-web
+docker run --rm -p 8080:8080 -e ApiBaseUrl=https://host.docker.internal:7228/ -e AllowInvalidApiCertificate=true raceday-web
 ```
-Open http://localhost:8080
+Open http://localhost:8080. The API must be running on the host machine. The AllowInvalidApiCertificate setting is only for local Docker runs, because the API uses a development certificate. The containerised site behaves the same as the one run locally.
 
 ## Run locally
 Open `Part2/RaceDay.Api/RaceDay.Api.slnx` in Visual Studio, set **RaceDay.Api** and **RaceDay.Web** as multiple startup projects, and start. Register an Organiser and a Participant account to try it.
