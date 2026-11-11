@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Build API
-        run: dotnet build Part2/RaceDay.Api/RaceDay.Api.csproj -c Release
+        run: dotnet build "$(find Part2 -iname 'RaceDay.Api.csproj' | head -n 1)" -c Release
 
       - name: Build MVC
-        run: dotnet build Part2/RaceDay.Web/RaceDay.Web.csproj -c Release
+        run: dotnet build "$(find Part2 -iname 'RaceDay.Web.csproj' | head -n 1)" -c Release
